@@ -7,8 +7,8 @@ ORANGE = (255, 80, 10)
 WHITE = (255, 255, 255)
 BLACK = (0,0,0)
 
-FPS = 60
-velocity = 3
+FPS = 10
+velocity = 20
 score = 0
 
 APPLE_EATEN = pygame.USEREVENT + 1
@@ -65,14 +65,15 @@ def tail_movement(tail,snake):
         tail[0].x=snake.x
         tail[0].y=snake.y
 
-def check_borders(snake,side):
+def check_borders(snake):
     if snake.x<0 or snake.x>WIDTH-snake.width or snake.y<0 or snake.y>HEIGHT-snake.height:
-        print(f'przegrałęś wynik {score}')
-        pygame.time.delay(5000)
-        snake.x = STARTX
-        snake.y = STARTY
-        return 'UPSIDE'
-    return side
+        lose_game()
+    return True
+
+def lose_game():
+    print(f'przegrałęś wynik {score}')
+    pygame.time.delay(3000)
+    pygame.quit()
 
 
 
@@ -88,25 +89,31 @@ def main():
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                pygame.quit()
+        if len(tail) == 0:
+            x=snake.x
+            y=snake.y
+        else:
+            x=tail[-1].x
+            y=tail[-1].y
+        keys_pressed=pygame.key.get_pressed()
+        tail_movement(tail, snake)
+        side = snake_movement(keys_pressed,snake,side)
         if snake.colliderect(apple):
+            print(apple)
             score+=1
             apple.x = random.randrange(500-GOLDEN_APPLE_IMAGE.get_width())
             apple.y = random.randrange(500-GOLDEN_APPLE_IMAGE.get_height())
-            if len(tail)==0:
-                tail.append(pygame.Rect(snake.x,snake.y,SNAKE_TAIL_IMAGE.get_width(),SNAKE_TAIL_IMAGE.get_height()))
-            else:
-                tail.append(pygame.Rect(tail[-1].x,tail[-1].y,SNAKE_TAIL_IMAGE.get_width(),SNAKE_TAIL_IMAGE.get_height()))
-            velocity = 3 + score//10
-        else:
-            tail_movement(tail,snake)
+            tail.append(pygame.Rect(x,y,20,20))
+            print(snake)
+            print(tail)
+        for i in range(len(tail)-1):
+            if snake.colliderect(tail[i+1]):
+                lose_game()
 
 
         pygame.time.Clock().tick(FPS)
-        keys_pressed=pygame.key.get_pressed()
-        side = snake_movement(keys_pressed,snake,side)
-
-        side = check_borders(snake,side)
+        check_borders(snake)
         draw_window(tail)
 
 
