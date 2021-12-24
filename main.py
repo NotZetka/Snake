@@ -5,6 +5,7 @@ WIDTH, HEIGHT = 500, 500
 
 ORANGE = (255, 80, 10)
 WHITE = (255, 255, 255)
+BLACK = (0,0,0)
 
 FPS = 60
 velocity = 3
@@ -12,7 +13,8 @@ score = 0
 
 APPLE_EATEN = pygame.USEREVENT + 1
 
-SNAKE_HEAD_IMAGE = pygame.transform.scale(pygame.image.load('assets/snakehead.png'),(20,20))
+SNAKE_HEAD_IMAGE_DEFAULT = pygame.transform.scale(pygame.image.load('assets/snakehead.png'),(20,20))
+SNAKE_HEAD_IMAGE = SNAKE_HEAD_IMAGE_DEFAULT
 SNAKE_TAIL_IMAGE = pygame.transform.scale(pygame.image.load('assets/snaketail.png'),(20,20))
 GOLDEN_APPLE_IMAGE = pygame.transform.scale(pygame.image.load('assets/GoldenApple.png'),(20,20))
 
@@ -23,20 +25,25 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Snake by Jakub Kochański')
 
 def draw_window():
-    WIN.fill(WHITE)
+    WIN.fill(BLACK)
     WIN.blit(SNAKE_HEAD_IMAGE,(snake.x,snake.y))
     WIN.blit(GOLDEN_APPLE_IMAGE,(apple.x,apple.y))
     pygame.display.update()
 
 def snake_movement(keys_pressed, snake,side):
+    global SNAKE_HEAD_IMAGE
     if keys_pressed[pygame.K_LEFT] and side != 'RIGHT':
         side = 'LEFT'
+        SNAKE_HEAD_IMAGE = pygame.transform.rotate(SNAKE_HEAD_IMAGE_DEFAULT,90)
     if keys_pressed[pygame.K_RIGHT] and side != 'LEFT':
         side =  'RIGHT'
+        SNAKE_HEAD_IMAGE = pygame.transform.rotate(SNAKE_HEAD_IMAGE_DEFAULT, 270)
     if keys_pressed[pygame.K_UP] and side != 'DOWN':
         side = 'UPSIDE'
+        SNAKE_HEAD_IMAGE = SNAKE_HEAD_IMAGE_DEFAULT
     if keys_pressed[pygame.K_DOWN] and side != 'UPSIDE':
         side= 'DOWN'
+        SNAKE_HEAD_IMAGE = pygame.transform.rotate(SNAKE_HEAD_IMAGE_DEFAULT, 180)
 
     if side == 'LEFT':
         snake.x -= velocity
@@ -73,8 +80,8 @@ def main():
                 run = False
         if snake.colliderect(apple):
             score+=1
-            apple.x = random.randrange(500)
-            apple.y = random.randrange(500)
+            apple.x = random.randrange(500-GOLDEN_APPLE_IMAGE.get_width())
+            apple.y = random.randrange(500-GOLDEN_APPLE_IMAGE.get_height())
             velocity = 3 + score//5
 
 
