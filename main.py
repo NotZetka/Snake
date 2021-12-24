@@ -24,8 +24,10 @@ STARTY = 250
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Snake by Jakub Kochański')
 
-def draw_window():
+def draw_window(tail):
     WIN.fill(BLACK)
+    for part in tail:
+        WIN.blit(SNAKE_TAIL_IMAGE,(part.x,part.y))
     WIN.blit(SNAKE_HEAD_IMAGE,(snake.x,snake.y))
     WIN.blit(GOLDEN_APPLE_IMAGE,(apple.x,apple.y))
     pygame.display.update()
@@ -55,6 +57,14 @@ def snake_movement(keys_pressed, snake,side):
         snake.y += velocity
     return side
 
+def tail_movement(tail,snake):
+    for i in range(1,len(tail)):
+        tail[-i].x=tail[-i-1].x
+        tail[-i].y=tail[-i-1].y
+    if len(tail)>0:
+        tail[0].x=snake.x
+        tail[0].y=snake.y
+
 def check_borders(snake,side):
     if snake.x<0 or snake.x>WIDTH-snake.width or snake.y<0 or snake.y>HEIGHT-snake.height:
         print(f'przegrałęś wynik {score}')
@@ -70,6 +80,7 @@ snake = pygame.Rect(STARTX,STARTY,SNAKE_HEAD_IMAGE.get_width(),SNAKE_HEAD_IMAGE.
 apple = pygame.Rect(random.randrange(500-GOLDEN_APPLE_IMAGE.get_width()),random.randrange(500-GOLDEN_APPLE_IMAGE.get_height()),GOLDEN_APPLE_IMAGE.get_width(),GOLDEN_APPLE_IMAGE.get_height())
 
 def main():
+    tail = []
     global velocity
     global score
     side = 'UPSIDE'
@@ -82,7 +93,13 @@ def main():
             score+=1
             apple.x = random.randrange(500-GOLDEN_APPLE_IMAGE.get_width())
             apple.y = random.randrange(500-GOLDEN_APPLE_IMAGE.get_height())
-            velocity = 3 + score//5
+            if len(tail)==0:
+                tail.append(pygame.Rect(snake.x,snake.y,SNAKE_TAIL_IMAGE.get_width(),SNAKE_TAIL_IMAGE.get_height()))
+            else:
+                tail.append(pygame.Rect(tail[-1].x,tail[-1].y,SNAKE_TAIL_IMAGE.get_width(),SNAKE_TAIL_IMAGE.get_height()))
+            velocity = 3 + score//10
+        else:
+            tail_movement(tail,snake)
 
 
         pygame.time.Clock().tick(FPS)
@@ -90,7 +107,7 @@ def main():
         side = snake_movement(keys_pressed,snake,side)
 
         side = check_borders(snake,side)
-        draw_window()
+        draw_window(tail)
 
 
 
