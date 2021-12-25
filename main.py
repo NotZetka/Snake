@@ -10,6 +10,7 @@ BLACK = (0,0,0)
 FPS = 10
 velocity = 20
 score = 0
+run = True
 
 APPLE_EATEN = pygame.USEREVENT + 1
 
@@ -68,10 +69,15 @@ def tail_movement(tail,snake):
 def check_borders(snake):
     if snake.x<0 or snake.x>WIDTH-snake.width or snake.y<0 or snake.y>HEIGHT-snake.height:
         lose_game()
+
     return True
 
 def lose_game():
-    print(f'przegrałęś wynik {score}')
+    pygame.font.init()
+    text = pygame.font.SysFont('comicsans', 20)
+    text = text.render(f'wynik {score}',1,WHITE)
+    WIN.blit(text,(WIDTH/2 - text.get_width() /2, HEIGHT/2 - text.get_height()/2))
+    pygame.display.update()
     pygame.time.delay(3000)
     pygame.quit()
 
@@ -85,11 +91,8 @@ def main():
     global velocity
     global score
     side = 'UPSIDE'
-    run = True
+    global run
     while run:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
         if len(tail) == 0:
             x=snake.x
             y=snake.y
@@ -107,16 +110,20 @@ def main():
             tail.append(pygame.Rect(x,y,20,20))
             print(snake)
             print(tail)
-        for i in range(len(tail)-1):
-            if snake.colliderect(tail[i+1]):
-                lose_game()
 
 
         pygame.time.Clock().tick(FPS)
-        check_borders(snake)
         draw_window(tail)
+        check_borders(snake)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                run = False
 
+        for i in range(len(tail)-1):
+            if snake.colliderect(tail[i+1]):
+                lose_game()
+                run = False
 
 
 main()
-pygame.quit()
