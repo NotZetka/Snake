@@ -10,7 +10,6 @@ BLACK = (0,0,0)
 FPS = 10
 velocity = 20
 score = 0
-run = True
 
 APPLE_EATEN = pygame.USEREVENT + 1
 
@@ -69,7 +68,7 @@ def tail_movement(tail,snake):
 def check_borders(snake):
     if snake.x<0 or snake.x>WIDTH-snake.width or snake.y<0 or snake.y>HEIGHT-snake.height:
         lose_game()
-
+        return False
     return True
 
 def lose_game():
@@ -91,7 +90,7 @@ def main():
     global velocity
     global score
     side = 'UPSIDE'
-    global run
+    run = True
     while run:
         if len(tail) == 0:
             x=snake.x
@@ -114,16 +113,17 @@ def main():
 
         pygame.time.Clock().tick(FPS)
         draw_window(tail)
-        check_borders(snake)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                run = False
-
-        for i in range(len(tail)-1):
-            if snake.colliderect(tail[i+1]):
-                lose_game()
-                run = False
+        run = check_borders(snake)
+        if run:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    run = False
+        if run:
+            for i in range(len(tail)-1):
+                if snake.colliderect(tail[i+1]):
+                    lose_game()
+                    run = False
 
 
 main()
