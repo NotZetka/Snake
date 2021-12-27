@@ -24,7 +24,7 @@ STARTY = 250
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Snake by Jakub Kochański')
 
-def draw_window(tail):
+def draw_window():
     WIN.fill(BLACK)
     for part in tail:
         WIN.blit(SNAKE_TAIL_IMAGE,(part.x,part.y))
@@ -84,9 +84,9 @@ def lose_game():
 
 snake = pygame.Rect(STARTX,STARTY,SNAKE_HEAD_IMAGE.get_width(),SNAKE_HEAD_IMAGE.get_height())
 apple = pygame.Rect(random.randrange(500-GOLDEN_APPLE_IMAGE.get_width()),random.randrange(500-GOLDEN_APPLE_IMAGE.get_height()),GOLDEN_APPLE_IMAGE.get_width(),GOLDEN_APPLE_IMAGE.get_height())
+tail = []
 
 def main():
-    tail = []
     global velocity
     global score
     side = 'UPSIDE'
@@ -112,7 +112,7 @@ def main():
 
 
         pygame.time.Clock().tick(FPS)
-        draw_window(tail)
+        draw_window()
         run = check_borders(snake)
         if run:
             for event in pygame.event.get():
